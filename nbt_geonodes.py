@@ -1137,27 +1137,28 @@ def derrk_node_group():
 	#Y
 	combine_xyz.inputs[1].default_value = 0.0
 
+	#node Math
+	math = derrk.nodes.new("ShaderNodeMath")
+	math.operation = 'RADIANS'
+	#Value_001
+	math.inputs[1].default_value = 0.5
+	#Value_002
+	math.inputs[2].default_value = 0.5
+
 	#node Math.001
 	math_001 = derrk.nodes.new("ShaderNodeMath")
-	math_001.operation = 'RADIANS'
+	math_001.label = "rotations"
+	math_001.operation = 'MULTIPLY'
 	#Value_001
-	math_001.inputs[1].default_value = 0.5
+	math_001.inputs[1].default_value = 1.0
 	#Value_002
 	math_001.inputs[2].default_value = 0.5
-
-	#node Math.004
-	math_004 = derrk.nodes.new("ShaderNodeMath")
-	math_004.label = "rotations"
-	math_004.operation = 'MULTIPLY'
-	#Value_001
-	math_004.inputs[1].default_value = 1.0
-	#Value_002
-	math_004.inputs[2].default_value = 0.5
 
 	#node Map Range
 	map_range = derrk.nodes.new("ShaderNodeMapRange")
 	map_range.data_type = 'FLOAT'
 	map_range.interpolation_type = 'LINEAR'
+	map_range.clamp = True
 	#From Min
 	map_range.inputs[1].default_value = 0.0
 	#From Max
@@ -1229,11 +1230,11 @@ def derrk_node_group():
 	#node Scene Time
 	scene_time = derrk.nodes.new("GeometryNodeInputSceneTime")
 
-	#node Math
-	math = derrk.nodes.new("ShaderNodeMath")
-	math.operation = 'DIVIDE'
+	#node Math.004
+	math_004 = derrk.nodes.new("ShaderNodeMath")
+	math_004.operation = 'DIVIDE'
 	#Value_002
-	math.inputs[2].default_value = 0.5
+	math_004.inputs[2].default_value = 0.5
 
 	#derrk inputs
 	#input Geometry
@@ -1242,7 +1243,7 @@ def derrk_node_group():
 
 	#input Duration (frames)
 	derrk.inputs.new('NodeSocketFloat', "Duration (frames)")
-	derrk.inputs[1].default_value = 100.0
+	derrk.inputs[1].default_value = 72.0
 	derrk.inputs[1].min_value = -10000.0
 	derrk.inputs[1].max_value = 10000.0
 	derrk.inputs[1].attribute_domain = 'POINT'
@@ -1256,30 +1257,30 @@ def derrk_node_group():
 	group_output.location = (1585.353271484375, 40.083099365234375)
 	transform_geometry.location = (1214.404541015625, 88.68504333496094)
 	combine_xyz.location = (1004.1426391601562, -51.61049270629883)
-	math_001.location = (781.9974975585938, -62.5918083190918)
-	math_004.location = (321.98321533203125, -349.44573974609375)
+	math.location = (781.9974975585938, -62.5918083190918)
+	math_001.location = (321.98321533203125, -349.44573974609375)
 	map_range.location = (149.5, -131.2206268310547)
 	float_curve.location = (-166.39129638671875, -232.71817016601562)
 	value.location = (148.8822784423828, -427.5000305175781)
 	math_002.location = (388.6282958984375, -101.3564453125)
 	math_003.location = (562.0, -139.60137939453125)
 	scene_time.location = (-655.6907348632812, -179.972412109375)
-	math.location = (-393.2391357421875, -154.84109497070312)
+	math_004.location = (-393.2391357421875, -154.84109497070312)
 	group_input.location = (-637.8641357421875, 71.05402374267578)
 
 	#Set dimensions
 	group_output.width, group_output.height = 140.0, 100.0
 	transform_geometry.width, transform_geometry.height = 140.0, 100.0
 	combine_xyz.width, combine_xyz.height = 140.0, 100.0
+	math.width, math.height = 140.0, 100.0
 	math_001.width, math_001.height = 140.0, 100.0
-	math_004.width, math_004.height = 140.0, 100.0
 	map_range.width, map_range.height = 140.0, 100.0
 	float_curve.width, float_curve.height = 240.0, 100.0
 	value.width, value.height = 140.0, 100.0
 	math_002.width, math_002.height = 140.0, 100.0
 	math_003.width, math_003.height = 140.0, 100.0
 	scene_time.width, scene_time.height = 140.0, 100.0
-	math.width, math.height = 140.0, 100.0
+	math_004.width, math_004.height = 140.0, 100.0
 	group_input.width, group_input.height = 140.0, 100.0
 
 	#initialize derrk links
@@ -1287,33 +1288,36 @@ def derrk_node_group():
 	derrk.links.new(transform_geometry.outputs[0], group_output.inputs[0])
 	#group_input.Geometry -> transform_geometry.Geometry
 	derrk.links.new(group_input.outputs[0], transform_geometry.inputs[0])
-	#math_001.Value -> combine_xyz.Z
-	derrk.links.new(math_001.outputs[0], combine_xyz.inputs[2])
+	#math.Value -> combine_xyz.Z
+	derrk.links.new(math.outputs[0], combine_xyz.inputs[2])
 	#combine_xyz.Vector -> transform_geometry.Rotation
 	derrk.links.new(combine_xyz.outputs[0], transform_geometry.inputs[2])
-	#math_003.Value -> math_001.Value
-	derrk.links.new(math_003.outputs[0], math_001.inputs[0])
-	#math.Value -> float_curve.Value
-	derrk.links.new(math.outputs[0], float_curve.inputs[1])
+	#math_003.Value -> math.Value
+	derrk.links.new(math_003.outputs[0], math.inputs[0])
+	#math_004.Value -> float_curve.Value
+	derrk.links.new(math_004.outputs[0], float_curve.inputs[1])
 	#float_curve.Value -> map_range.Value
 	derrk.links.new(float_curve.outputs[0], map_range.inputs[0])
-	#scene_time.Frame -> math.Value
-	derrk.links.new(scene_time.outputs[1], math.inputs[0])
+	#scene_time.Frame -> math_004.Value
+	derrk.links.new(scene_time.outputs[1], math_004.inputs[0])
 	#map_range.Result -> math_002.Value
 	derrk.links.new(map_range.outputs[0], math_002.inputs[0])
 	#math_002.Value -> math_003.Value
 	derrk.links.new(math_002.outputs[0], math_003.inputs[0])
-	#value.Value -> math_004.Value
-	derrk.links.new(value.outputs[0], math_004.inputs[0])
-	#math_004.Value -> math_002.Value
-	derrk.links.new(math_004.outputs[0], math_002.inputs[1])
+	#value.Value -> math_001.Value
+	derrk.links.new(value.outputs[0], math_001.inputs[0])
+	#math_001.Value -> math_002.Value
+	derrk.links.new(math_001.outputs[0], math_002.inputs[1])
 	#group_input.Duration (frames) -> math_003.Value
 	derrk.links.new(group_input.outputs[1], math_003.inputs[1])
-	#group_input.Duration (frames) -> math.Value
-	derrk.links.new(group_input.outputs[1], math.inputs[1])
+	#group_input.Duration (frames) -> math_004.Value
+	derrk.links.new(group_input.outputs[1], math_004.inputs[1])
 	#group_input.Duration (frames) -> map_range.To Max
 	derrk.links.new(group_input.outputs[1], map_range.inputs[4])
 	return derrk
+
+
+
 
 
 
